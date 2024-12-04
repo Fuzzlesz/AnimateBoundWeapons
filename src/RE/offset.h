@@ -4,7 +4,7 @@ namespace RE
 	{
 		namespace Script
 		{
-			constexpr auto SetPlayerTeammate = REL::ID(37717);
+			constexpr auto SetPlayerTeammate = REL::ID(36707);
 		}
 	}
 }
