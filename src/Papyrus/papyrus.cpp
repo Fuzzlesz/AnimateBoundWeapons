@@ -47,19 +47,23 @@ namespace Papyrus
 
 		RE::SetPlayerTeammate(a_actor, true, true);
 
-		//Duration fuckery - The spell was effectively dual cast, hence duration mismatch between bound weapon and summon
-		std::vector<uint32_t> oldDurations{};
-		float remainder = summonEffect->duration - summonEffect->elapsedSeconds;
+		// Simple AME manipulation in case there is a mismatch between bound weapon duration and summon effect duration.
+		uint32_t maxDur = 0;
 		for (auto* effect : boundSpell->effects) {
-			oldDurations.push_back(effect->GetDuration());
-			effect->effectItem.duration = static_cast<uint32_t>(remainder);
+			if (!effect || !effect->baseEffect) {
+				continue;
+			}
+			const auto baseEffect = effect->baseEffect;
+			if (baseEffect->GetArchetype() != RE::EffectSetting::Archetype::kBoundWeapon) {
+				continue;
+			}
+
+			const auto currentDur = effect->GetDuration();
+			maxDur = currentDur > maxDur ? currentDur : maxDur;
 		}
 		magicCaster->CastSpellImmediate(boundSpell, false, creature, 1.0f, false, 0.0f, creature);
-
-		auto durIt = oldDurations.begin();
-		for (auto effIt = boundSpell->effects.begin(); effIt != boundSpell->effects.end() && durIt != oldDurations.end(); ++effIt, ++durIt) {
-			(*effIt)->effectItem.duration = (*durIt);
-		}
+		summonEffect->elapsedSeconds = 0.0f;
+		summonEffect->duration = static_cast<float>(maxDur);
 	}
 
 	void Bind(VM& a_vm) {
