@@ -32,7 +32,9 @@ namespace Hooks
 		if (a_this && a_this->GetActorBase() == unsheathingSpectre && !a_draw) {
 			if (a_this->IsCommandedActor() && a_this->GetCommandingActor().get()) {
 				if (const auto weaponState = a_this->GetCommandingActor()->GetWeaponState();
-					weaponState == RE::WEAPON_STATE::kDrawing || weaponState == RE::WEAPON_STATE::kWantToDraw) {
+					weaponState == RE::WEAPON_STATE::kDrawing 
+					|| weaponState == RE::WEAPON_STATE::kWantToDraw
+					|| weaponState == RE::WEAPON_STATE::kDrawn) {
 					return;
 				}
 				else {
